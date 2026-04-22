@@ -1,0 +1,50 @@
+[
+  {
+    "id": "2fdd6d96",
+    "date": "22/04/2026 13:29",
+    "nom": "james",
+    "prenom": "nora",
+    "age": "24",
+    "contact": "653527358",
+    "depart": "yaounde",
+    "destination": "kribi",
+    "distance": 160.0,
+    "vehicule": "voiture",
+    "trafic": "moyen",
+    "moment": "jour",
+    "duree": 150,
+    "tarif": 53900
+  },
+  {
+    "id": "ec7aae05",
+    "date": "22/04/2026 13:35",
+    "nom": "ruger",
+    "prenom": "chelsy",
+    "age": "20",
+    "contact": "681400957",
+    "depart": "yaounde",
+    "destination": "lagos",
+    "distance": 160.0,
+    "vehicule": "vip",
+    "trafic": "moyen",
+    "moment": "jour",
+    "duree": 100,
+    "tarif": 146300
+  },
+  {
+    "id": "748782e8",
+    "date": "22/04/2026 13:37",
+    "nom": "clovis",
+    "prenom": "beacon",
+    "age": "25",
+    "contact": "681400957",
+    "depart": "yaounde",
+    "destination": "kumba",
+    "distance": 80.0,
+    "vehicule": "vip",
+    "trafic": "moyen",
+    "moment": "jour",
+    "duree": 50,
+    "tarif": 75900
+  }
+]
