@@ -151,6 +151,42 @@
     </button>
 
     <div id="recu-preview" class="recu-box" style="display:none"></div>
+
+    <!-- LICENCE -->
+    <div style="max-width: 650px; margin: 40px auto 20px auto; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 18px; padding: 0; box-shadow: 0 15px 50px rgba(0,0,0,0.4); overflow: hidden; border: 2px solid #4fc3f7;">
+      <div style="background: linear-gradient(135deg, #4fc3f7, #0288d1); padding: 20px; text-align: center;">
+        <div style="font-size: 2rem; margin-bottom: 3px;">&#128196;</div>
+        <h3 style="color: white; margin: 0; font-weight: 800; letter-spacing: 1px;">LICENCE OFFICIELLE</h3>
+        <p style="color: rgba(255,255,255,0.9); margin: 3px 0 0 0; font-size: 1rem;">Chelsyn Transport</p>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 12px; padding: 18px; background: rgba(255,255,255,0.05);">
+        <div style="background: linear-gradient(135deg, #4fc3f7, #0288d1); color: #000; padding: 8px 20px; border-radius: 25px; font-weight: bold; font-size: 0.85rem;">&#127891; Matricule : 24F2555</div>
+        <div style="background: linear-gradient(135deg, #7c4dff, #651fff); color: white; padding: 8px 20px; border-radius: 25px; font-weight: bold; font-size: 0.85rem;">&#128218; TP EC2 232</div>
+      </div>
+      <div style="padding: 20px 30px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 12px 8px; font-weight: bold; color: #4fc3f7; width: 130px;">&#128100; Auteur</td>
+            <td style="padding: 12px 8px; color: white; font-weight: 500;">BURINUY KELLY - CHELSY</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 12px 8px; font-weight: bold; color: #4fc3f7;">&#128179; Matricule</td>
+            <td style="padding: 12px 8px; color: white; font-weight: 500;">24F2555</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 12px 8px; font-weight: bold; color: #4fc3f7;">&#128214; Cours</td>
+            <td style="padding: 12px 8px; color: white; font-weight: 500;">TP EC2 232 - INFO 232</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 8px; font-weight: bold; color: #4fc3f7;">&#169; Copyright</td>
+            <td style="padding: 12px 8px; color: #ffd740; font-weight: 500;">2026 - Tous droits reserves</td>
+          </tr>
+        </table>
+      </div>
+      <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="color: #90a4ae; font-size: 0.75rem; margin: 0;">&#128274; Logiciel academique - Usage educatif uniquement.</p>
+      </div>
+    </div>
   </section>
 
   <!-- RECUS -->
@@ -175,6 +211,7 @@
     <button class="btn-submit" onclick="loadStats()">Calculer les statistiques</button>
     <div id="stats-result"></div>
   </section>
+
 </main>
 
 <script>
@@ -286,11 +323,9 @@ function loadReceipts() {
           </div>
         </div>
         <div class="recu-card-body">
-          <div class="card-info">
-            <b>${r.prenom} ${r.nom}</b> | ${r.contact}
-          </div>
-          <div class="card-trajet">${r.depart} → ${r.destination} | ${r.distance} km</div>
-          <div class="card-tarif">${r.tarif.toLocaleString()} FCFA — ${r.duree} min</div>
+          <div class="card-info"><b>${r.prenom} ${r.nom}</b> | ${r.contact}</div>
+          <div class="card-trajet">${r.depart} &#10132; ${r.destination} | ${r.distance} km</div>
+          <div class="card-tarif">${r.tarif.toLocaleString()} FCFA &#8212; ${r.duree} min</div>
         </div>
       </div>
     `).join('');
@@ -300,291 +335,54 @@ function loadReceipts() {
 function deleteReceipt(id) {
   if (!confirm('Supprimer ce recu ?')) return;
   fetch('/api/receipt/' + id, {method:'DELETE'})
-  .then(() => {
-    document.getElementById('card-' + id).style.opacity = '0';
-    setTimeout(() => loadReceipts(), 300);
-    showToast('Recu supprime', 'error');
-  });
+  .then(() => { document.getElementById('card-' + id).style.opacity = '0'; setTimeout(() => loadReceipts(), 300); showToast('Recu supprime', 'error'); });
 }
 
 function updateBadge(n) {
   if (n === undefined) {
-    fetch('/api/receipts').then(r => r.json()).then(l => {
-      document.getElementById('badge-total').textContent = l.length + ' recus';
-    });
+    fetch('/api/receipts').then(r => r.json()).then(l => { document.getElementById('badge-total').textContent = l.length + ' recus'; });
   } else {
     document.getElementById('badge-total').textContent = n + ' recus';
   }
 }
 
-function destroyChart(id) {
-  if (chartInstances[id]) {
-    chartInstances[id].destroy();
-    delete chartInstances[id];
-  }
-}
+function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
 
 function loadStats() {
-  document.getElementById('stats-result').innerHTML =
-    '<div class="loading"><div class="spinner"></div><p>Calcul en cours...</p></div>';
-  fetch('/api/stats')
-  .then(r => r.json())
-  .then(data => {
-    if (data.error) {
-      document.getElementById('stats-result').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">&#9888;</div><p>' + data.error + '</p></div>';
-      return;
-    }
-
-    let classifHTML = '';
-    if (data.classification && !data.classification.info) {
-      const entries = Object.entries(data.classification);
-      classifHTML = entries.map(([k,v]) =>
-        `<div class="classif-row">
-          <span class="classif-name">${k}</span>
-          <div class="classif-bar-wrap">
-            <div class="classif-bar" style="width:${(v*100).toFixed(0)}%"></div>
-          </div>
-          <span class="classif-val">${(v*100).toFixed(1)}%</span>
-        </div>`).join('');
-    } else {
-      classifHTML = '<p class="info-msg">Besoin de plus de donnees variees (min 6 recus)</p>';
-    }
-
-    let corrHTML = Object.entries(data.correlations).map(([k,v]) => {
-      const pct = Math.abs(v) * 100;
-      const color = v > 0 ? '#4fc3f7' : '#ef5350';
-      return `<div class="classif-row">
-        <span class="classif-name">${k} / Tarif</span>
-        <div class="classif-bar-wrap">
-          <div class="classif-bar" style="width:${pct.toFixed(0)}%;background:${color}"></div>
-        </div>
-        <span class="classif-val">r = ${v}</span>
-      </div>`;
-    }).join('');
-
-    document.getElementById('stats-result').innerHTML = `
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <div class="stat-card-title">Regression Lineaire Simple</div>
-          <div class="stat-formula">${data.regression_simple.equation}</div>
-          <div class="stat-r2">R² = <b>${data.regression_simple.r2}</b></div>
-          <p class="stat-desc">Relation entre distance parcourue et tarif applique.</p>
-          <div class="chart-wrap"><canvas id="chartSimple"></canvas></div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-title">Regression Lineaire Multiple</div>
-          <div class="stat-r2">R² = <b>${data.regression_multiple.r2}</b></div>
-          <p class="stat-desc">Variables : distance, trafic, moment, vehicule.</p>
-          <p class="stat-desc">Coefficients : ${data.regression_multiple.coefs.join(' | ')}</p>
-          <div class="chart-wrap"><canvas id="chartMultiple"></canvas></div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-title">PCA - Reduction Dimensionnalite</div>
-          <div class="stat-r2">Variance totale expliquee : <b>${(data.pca.total*100).toFixed(1)}%</b></div>
-          <p class="stat-desc">Composantes principales extraites des 4 variables.</p>
-          <div class="chart-wrap"><canvas id="chartPCA"></canvas></div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-title">Correlations</div>
-          <p class="stat-desc">Force de liaison entre les variables et le tarif.</p>
-          <div class="chart-wrap"><canvas id="chartCorr"></canvas></div>
-          <div style="margin-top:12px">${corrHTML}</div>
-        </div>
-
-        <div class="stat-card full">
-          <div class="stat-card-title">Classification Supervisee</div>
-          <p class="stat-desc">Categories : economique (&lt;5000 F) | standard (5000-15000 F) | premium (&gt;15000 F)</p>
-          <div class="chart-wrap"><canvas id="chartClassif"></canvas></div>
-          <div style="margin-top:15px">${classifHTML}</div>
-        </div>
-
-      </div>
-      <p class="info-msg" style="margin-top:15px">Analyse basee sur <b>${data.nb_recus}</b> recus enregistres</p>
-    `;
-
+  document.getElementById('stats-result').innerHTML = '<div class="loading"><div class="spinner"></div><p>Calcul en cours...</p></div>';
+  fetch('/api/stats').then(r => r.json()).then(data => {
+    if (data.error) { document.getElementById('stats-result').innerHTML = '<div class="empty-state"><div class="empty-icon">&#9888;</div><p>' + data.error + '</p></div>'; return; }
+    let classifHTML = ''; if (data.classification && !data.classification.info) { const entries = Object.entries(data.classification); classifHTML = entries.map(([k,v]) => `<div class="classif-row"><span class="classif-name">${k}</span><div class="classif-bar-wrap"><div class="classif-bar" style="width:${(v*100).toFixed(0)}%"></div></div><span class="classif-val">${(v*100).toFixed(1)}%</span></div>`).join(''); } else { classifHTML = '<p class="info-msg">Besoin de plus de donnees (min 6 recus)</p>'; }
+    let corrHTML = Object.entries(data.correlations).map(([k,v]) => { const pct = Math.abs(v)*100; const color = v>0?'#4fc3f7':'#ef5350'; return `<div class="classif-row"><span class="classif-name">${k} / Tarif</span><div class="classif-bar-wrap"><div class="classif-bar" style="width:${pct.toFixed(0)}%;background:${color}"></div></div><span class="classif-val">r = ${v}</span></div>`; }).join('');
+    document.getElementById('stats-result').innerHTML = `<div class="stats-grid">
+      <div class="stat-card"><div class="stat-card-title">Regression Lineaire Simple</div><div class="stat-formula">${data.regression_simple.equation}</div><div class="stat-r2">R² = <b>${data.regression_simple.r2}</b></div><p class="stat-desc">Relation distance / tarif</p><div class="chart-wrap"><canvas id="chartSimple"></canvas></div></div>
+      <div class="stat-card"><div class="stat-card-title">Regression Multiple</div><div class="stat-r2">R² = <b>${data.regression_multiple.r2}</b></div><p class="stat-desc">Coefs: ${data.regression_multiple.coefs.join(' | ')}</p><div class="chart-wrap"><canvas id="chartMultiple"></canvas></div></div>
+      <div class="stat-card"><div class="stat-card-title">PCA</div><div class="stat-r2">Variance: <b>${(data.pca.total*100).toFixed(1)}%</b></div><div class="chart-wrap"><canvas id="chartPCA"></canvas></div></div>
+      <div class="stat-card"><div class="stat-card-title">Correlations</div><div class="chart-wrap"><canvas id="chartCorr"></canvas></div><div style="margin-top:12px">${corrHTML}</div></div>
+      <div class="stat-card full"><div class="stat-card-title">Classification</div><div class="chart-wrap"><canvas id="chartClassif"></canvas></div><div style="margin-top:15px">${classifHTML}</div></div>
+    </div><p class="info-msg" style="margin-top:15px">Analyse sur <b>${data.nb_recus}</b> recus</p>`;
     renderCharts(data);
   });
 }
 
 function renderCharts(data) {
-  const gridColor = 'rgba(255,255,255,0.05)';
-  const textColor = '#90a4ae';
-
-  // -- Chart Regression Simple --
-  destroyChart('chartSimple');
-  const ctxS = document.getElementById('chartSimple').getContext('2d');
-  const xs = data.chart_data.distances;
-  const ys = data.chart_data.tarifs;
-  const pred = data.chart_data.predictions_simple;
-  chartInstances['chartSimple'] = new Chart(ctxS, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: 'Donnees reelles',
-          data: xs.map((x,i) => ({x, y: ys[i]})),
-          backgroundColor: '#4fc3f7',
-          pointRadius: 7
-        },
-        {
-          label: 'Droite de regression',
-          data: xs.map((x,i) => ({x, y: pred[i]})),
-          type: 'line',
-          borderColor: '#f57c00',
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: textColor } } },
-      scales: {
-        x: { title: { display:true, text:'Distance (km)', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } },
-        y: { title: { display:true, text:'Tarif (FCFA)', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } }
-      }
-    }
-  });
-
-  // -- Chart Regression Multiple (valeurs reelles vs predites) --
-  destroyChart('chartMultiple');
-  const ctxM = document.getElementById('chartMultiple').getContext('2d');
-  chartInstances['chartMultiple'] = new Chart(ctxM, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: 'Reel vs Predit',
-          data: ys.map((y,i) => ({x: y, y: data.chart_data.predictions_multiple[i]})),
-          backgroundColor: '#ab47bc',
-          pointRadius: 7
-        },
-        {
-          label: 'Ligne parfaite',
-          data: [{x: Math.min(...ys), y: Math.min(...ys)},
-                 {x: Math.max(...ys), y: Math.max(...ys)}],
-          type: 'line',
-          borderColor: '#f57c00',
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: textColor } } },
-      scales: {
-        x: { title: { display:true, text:'Tarif reel (FCFA)', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } },
-        y: { title: { display:true, text:'Tarif predit (FCFA)', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } }
-      }
-    }
-  });
-
-  // -- Chart PCA --
-  destroyChart('chartPCA');
-  const ctxP = document.getElementById('chartPCA').getContext('2d');
-  const variance = data.pca.variance_expliquee;
-  chartInstances['chartPCA'] = new Chart(ctxP, {
-    type: 'bar',
-    data: {
-      labels: variance.map((_,i) => 'Composante ' + (i+1)),
-      datasets: [{
-        label: 'Variance expliquee (%)',
-        data: variance.map(v => (v*100).toFixed(2)),
-        backgroundColor: ['#4fc3f7','#ab47bc','#66bb6a','#ffa726'],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: textColor } } },
-      scales: {
-        x: { ticks: { color: textColor }, grid: { color: gridColor } },
-        y: { title: { display:true, text:'% variance', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } }
-      }
-    }
-  });
-
-  // -- Chart Correlations --
-  destroyChart('chartCorr');
-  const ctxC = document.getElementById('chartCorr').getContext('2d');
-  const corrKeys = Object.keys(data.correlations);
-  const corrVals = Object.values(data.correlations);
-  chartInstances['chartCorr'] = new Chart(ctxC, {
-    type: 'bar',
-    data: {
-      labels: corrKeys.map(k => k + ' / Tarif'),
-      datasets: [{
-        label: 'Coefficient r',
-        data: corrVals,
-        backgroundColor: corrVals.map(v => v >= 0 ? '#4fc3f7' : '#ef5350'),
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: textColor } } },
-      scales: {
-        x: { ticks: { color: textColor }, grid: { color: gridColor } },
-        y: { min: -1, max: 1,
-             title: { display:true, text:'r', color: textColor },
-             ticks: { color: textColor }, grid: { color: gridColor } }
-      }
-    }
-  });
-
-  // -- Chart Classification --
-  destroyChart('chartClassif');
-  const ctxCl = document.getElementById('chartClassif').getContext('2d');
-  if (data.classification && !data.classification.info) {
-    const clKeys = Object.keys(data.classification);
-    const clVals = Object.values(data.classification).map(v => (v*100).toFixed(1));
-    chartInstances['chartClassif'] = new Chart(ctxCl, {
-      type: 'bar',
-      data: {
-        labels: clKeys,
-        datasets: [{
-          label: 'Accuracy (%)',
-          data: clVals,
-          backgroundColor: ['#4fc3f7','#66bb6a','#ffa726','#ab47bc','#ef5350'],
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: textColor } } },
-        scales: {
-          x: { ticks: { color: textColor }, grid: { color: gridColor } },
-          y: { min: 0, max: 100,
-               title: { display:true, text:'Accuracy (%)', color: textColor },
-               ticks: { color: textColor }, grid: { color: gridColor } }
-        }
-      }
-    });
-  }
+  const gc='rgba(255,255,255,0.05)',tc='#90a4ae';
+  destroyChart('chartSimple'); const ctxS=document.getElementById('chartSimple').getContext('2d'); const xs=data.chart_data.distances,ys=data.chart_data.tarifs,pred=data.chart_data.predictions_simple;
+  chartInstances['chartSimple']=new Chart(ctxS,{type:'scatter',data:{datasets:[{label:'Reel',data:xs.map((x,i)=>({x,y:ys[i]})),backgroundColor:'#4fc3f7',pointRadius:7},{label:'Regression',data:xs.map((x,i)=>({x,y:pred[i]})),type:'line',borderColor:'#f57c00',borderWidth:2,pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{labels:{color:tc}}},scales:{x:{title:{display:true,text:'Distance (km)',color:tc},ticks:{color:tc},grid:{color:gc}},y:{title:{display:true,text:'Tarif (FCFA)',color:tc},ticks:{color:tc},grid:{color:gc}}}}});
+  destroyChart('chartMultiple'); const ctxM=document.getElementById('chartMultiple').getContext('2d');
+  chartInstances['chartMultiple']=new Chart(ctxM,{type:'scatter',data:{datasets:[{label:'Reel vs Predit',data:ys.map((y,i)=>({x:y,y:data.chart_data.predictions_multiple[i]})),backgroundColor:'#ab47bc',pointRadius:7},{label:'Parfait',data:[{x:Math.min(...ys),y:Math.min(...ys)},{x:Math.max(...ys),y:Math.max(...ys)}],type:'line',borderColor:'#f57c00',borderWidth:2,pointRadius:0,fill:false}]},options:{responsive:true,plugins:{legend:{labels:{color:tc}}},scales:{x:{title:{display:true,text:'Reel',color:tc},ticks:{color:tc},grid:{color:gc}},y:{title:{display:true,text:'Predit',color:tc},ticks:{color:tc},grid:{color:gc}}}}});
+  destroyChart('chartPCA'); const ctxP=document.getElementById('chartPCA').getContext('2d'); const vr=data.pca.variance_expliquee;
+  chartInstances['chartPCA']=new Chart(ctxP,{type:'bar',data:{labels:vr.map((_,i)=>'PC'+(i+1)),datasets:[{label:'% Variance',data:vr.map(v=>(v*100).toFixed(2)),backgroundColor:['#4fc3f7','#ab47bc','#66bb6a','#ffa726'],borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:tc}}},scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{title:{display:true,text:'%',color:tc},ticks:{color:tc},grid:{color:gc}}}}});
+  destroyChart('chartCorr'); const ctxC=document.getElementById('chartCorr').getContext('2d'); const ck=Object.keys(data.correlations),cv=Object.values(data.correlations);
+  chartInstances['chartCorr']=new Chart(ctxC,{type:'bar',data:{labels:ck.map(k=>k+' / Tarif'),datasets:[{label:'r',data:cv,backgroundColor:cv.map(v=>v>=0?'#4fc3f7':'#ef5350'),borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:tc}}},scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{min:-1,max:1,title:{display:true,text:'r',color:tc},ticks:{color:tc},grid:{color:gc}}}}});
+  destroyChart('chartClassif'); const ctxCl=document.getElementById('chartClassif').getContext('2d'); if(data.classification&&!data.classification.info){const clK=Object.keys(data.classification),clV=Object.values(data.classification).map(v=>(v*100).toFixed(1)); chartInstances['chartClassif']=new Chart(ctxCl,{type:'bar',data:{labels:clK,datasets:[{label:'Accuracy %',data:clV,backgroundColor:['#4fc3f7','#66bb6a','#ffa726','#ab47bc','#ef5350'],borderRadius:8}]},options:{responsive:true,plugins:{legend:{labels:{color:tc}}},scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{min:0,max:100,title:{display:true,text:'%',color:tc},ticks:{color:tc},grid:{color:gc}}}}});}
 }
 
 function showToast(msg, type) {
-  const t = document.createElement('div');
-  t.className = 'toast toast-' + type;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.classList.add('show'), 10);
+  const t = document.createElement('div'); t.className = 'toast toast-' + type; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.classList.add('show'), 10);
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
 }
-
 updateBadge();
 </script>
 </body>

@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, jsonify
 import json, os, uuid
 from datetime import datetime
@@ -64,10 +65,6 @@ def calculer_tarif(distance, vehicule, trafic, moment):
 @app.route("/")
 def index():
     return render_template("index.html")
-
-@app.route('/licence')
-def licence():
-    return render_template('licence.html')
 
 @app.route("/api/receipts", methods=["GET"])
 def get_receipts():
@@ -204,6 +201,7 @@ def get_stats():
             "predictions_multiple": lr_multi.predict(X_multi).tolist()
         }
     })
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
